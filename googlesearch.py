@@ -1,11 +1,11 @@
 '''
 Created on May 5, 2017
 
-@author: anthony
+@thanks anthony
+@author sripirakas
 '''
 from urllib import request
 import urllib
-#import urllib2
 
 import math
 import re
@@ -29,26 +29,22 @@ class GoogleSearch:
     def search(self, query, num_results = 10, prefetch_pages = True, prefetch_threads = 10, language = "en"):
         searchResults = []
         pages = int(math.ceil(num_results / float(GoogleSearch.RESULTS_PER_PAGE)));
-        print("Pages: "+str(pages))
+        
         fetcher_threads = deque([])
         total = None;
         for i in range(pages) :
             start = i * GoogleSearch.RESULTS_PER_PAGE
             print("Start: "+ str(start))
-            #opener = urllib2.build_opener()
             opener = request.build_opener()
             opener.addheaders = GoogleSearch.DEFAULT_HEADERS
             
-            #response = opener.open(GoogleSearch.SEARCH_URL + "?q="+ urllib2.quote(query) + "&hl=" + language + ("" if start == 0 else ("&start=" + str(start))))
             response = opener.open(GoogleSearch.SEARCH_URL + "?q="+ urllib.parse.quote(query) + "&hl=" + language + ("" if start == 0 else ("&start=" + str(start))))
-            print("got response")
+            
             soup = BeautifulSoup(response.read(), "lxml")
-            print("soup converted")
+           
             response.close()
-            if total is None:
-                #totalText = soup.select(GoogleSearch.TOTAL_SELECTOR)[0].children.next().encode('utf-8')
+            if total is None:                
                 totalText = soup.select(GoogleSearch.TOTAL_SELECTOR)[0].children.__next__().encode('utf-8').decode('utf-8')
-                print("TotalText: "+str(totalText))
                 total = int(re.sub("[',\. ]", "", re.search("(([0-9]+[',\. ])*[0-9]+)", totalText).group(1)))
             results = self.parseResults(soup.select(GoogleSearch.RESULT_SELECTOR))
             if len(searchResults) + len(results) > num_results:
@@ -69,7 +65,6 @@ class GoogleSearch:
                     fetcher_threads.append(fetcher_thread)
         for thread in fetcher_threads:
             thread.join()
-        print("returning the results")
         return SearchResponse(searchResults, total);
         
     def parseResults(self, results):
@@ -102,7 +97,6 @@ class SearchResult:
     
     def getMarkup(self):
         if self.__markup is None:
-            #opener = urllib2.build_opener()
             opener = request.build_opener()
             opener.addheaders = GoogleSearch.DEFAULT_HEADERS
             response = opener.open(self.url);
