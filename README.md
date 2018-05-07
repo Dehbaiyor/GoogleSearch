@@ -6,9 +6,10 @@ The original code can be found at https://pypi.org/project/google-search/#descri
 
 **Sometimes, python's default print() statement many not work with Windows Command Prompt and throw errors when priting the text from webpages**. This due to Windows Command Prompt's incompatibility with unicode encoding. A workaround is to use the following method:
 
-import sys
+
 
 ```python
+import sys
 def uprint(*objects, sep=' ', end='\n', file=sys.stdout):
     enc = file.encoding
     if enc == 'UTF-8':
